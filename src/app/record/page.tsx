@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 
 const Page = function Records() {
     return (
-        <main className="flex min-h-screen flex-col items-center justify-center">
+        <main className="flex min-h-dvh flex-col items-center justify-center">
             <div className="text-4xl relative z-[-1] flex place-items-center mb-6">
                 Record
             </div>
