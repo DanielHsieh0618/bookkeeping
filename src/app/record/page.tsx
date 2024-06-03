@@ -1,7 +1,8 @@
 
+'use client';
 
 import Link from "next/link";
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -9,32 +10,90 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
+import { useRouter } from 'next/navigation'
+
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+ 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+
+import { useState } from "react";
 
 const Page = function Records() {
+
+    const [typeInput, setTypeInput] = useState("expenses");
+    const [descriptionInput, setDescriptionInput] = useState("");
+    const [amountInput, setAmountInput] = useState(0);
+
+    const router = useRouter()
+
+    async function addRecord() {
+        const data = {
+            userId: 1,
+            categoryId: 1,
+            description: descriptionInput,
+            recordType: typeInput,
+            amount: amountInput,
+            recordDate: new Date().toDateString(),
+        }
+        await fetch("/api/records", {
+            method: "POST",
+            credentials: "same-origin",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            redirect: "follow",
+            referrerPolicy: "no-referrer",
+            body: JSON.stringify(data), // body data type must match "Content-Type" header
+        });
+
+        router.push("/")
+    }
+
+
     return (
         <Card className="flex-auto">
             <CardHeader>
                 <CardTitle>Record</CardTitle>
             </CardHeader>
             <CardContent>
-                <p>使用者 / UserId</p>
-                <p>類別 / CategoryId </p>
-                <p>描述 / Description</p>
-                <p>收支 / Type</p>
-                <p>金額 / amount</p>
+                <div className="grid w-full max-w-sm items-center gap-1.5 mb-3">
+                    <Label htmlFor="type">Type</Label>
+                    <Select value={typeInput} onValueChange={setTypeInput}>
+                        <SelectTrigger id="type" >
+                            <SelectValue placeholder="Select a Type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="expenses">Expenses</SelectItem>
+                            <SelectItem value="income">Income</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+                <div className="grid w-full max-w-sm items-center gap-1.5 mb-3">
+                    <Label htmlFor="amount">Amount</Label>
+                    <Input type="number" id="amount" placeholder="Amount" value={amountInput} onChange={(event)=>setAmountInput(event.target.value)} />
+                </div>
+                <div className="grid w-full max-w-sm items-center gap-1.5 mb-3">
+                    <Label htmlFor="description">Description</Label>
+                    <Input type="text" id="description" placeholder="Description" value={descriptionInput} onChange={(event)=>setDescriptionInput(event.target.value)} />
+                </div>
             </CardContent>
             <CardFooter className="flex gap-3 justify-start">
-                <Link href="/" className="flex-auto">
+                <Link href="/" className="flex-1">
                     <Button className="w-full">
                         Cancel
                     </Button>
                 </Link>
-                <Link href="/" className="flex-auto">
-                    <Button className="w-full">
-                        Add
-                    </Button>
-                </Link>
+                <Button className="flex-1" onClick={addRecord} >
+                    Add
+                </Button>
             </CardFooter>
         </Card>
     );
