@@ -11,9 +11,24 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { sql } from "@vercel/postgres";
 
+export default async function Home() {
 
-export default function Home() {
+    
+    const { rows } = await sql`SELECT * FROM records;`;
+
+    const record = rows.map((record) => (
+        <li key={record.record_id} className="flex">
+            <span className="flex-1">{new Date(record.record_date).toLocaleDateString()}</span>
+            <span className="flex-1">{record.record_type}</span>
+            <span className="flex-1">{record.category_id}</span>
+            <span className="flex-1">{record.user_id}</span>
+            <span className="flex-1">{record.description} </span>
+            <span className="flex-1">{record.amount}</span>
+        </li>
+    ));
+
     return (
         <>
             <Card className="flex-auto">
@@ -39,13 +54,19 @@ export default function Home() {
                     </Link>
                 </CardHeader>
                 <CardContent>
-                    <p>Card Content</p>
+                    <ul>
+                        <li className="flex">
+                            <span className="flex-1">Date</span>
+                            <span className="flex-1">Type</span>
+                            <span className="flex-1">Category Id</span>
+                            <span className="flex-1">User Id</span>
+                            <span className="flex-1">Description</span>
+                            <span className="flex-1">Amount</span>
+                        </li>
+                        {record}
+                    </ul>
                 </CardContent>
-                <CardFooter>
-                    <p>Card Footer</p>
-                </CardFooter>
             </Card>
-           
         </>
     );
 }
