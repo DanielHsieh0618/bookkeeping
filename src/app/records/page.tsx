@@ -1,7 +1,7 @@
 
 
 import Link from "next/link";
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import { CirclePlus } from 'lucide-react';
 import {
   Card,
@@ -10,7 +10,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 import { sql } from "@vercel/postgres";
 
 export default async function Home() {
@@ -22,10 +22,10 @@ export default async function Home() {
         <li key={record.record_id} className="flex">
             <span className="flex-1">{new Date(record.record_date).toLocaleDateString()}</span>
             <span className="flex-1">{record.record_type}</span>
+            <span className="flex-1">{record.amount}</span>
             <span className="flex-1">{record.category_id}</span>
             <span className="flex-1">{record.user_id}</span>
             <span className="flex-1">{record.description} </span>
-            <span className="flex-1">{record.amount}</span>
         </li>
     ));
 
@@ -55,13 +55,13 @@ export default async function Home() {
                 </CardHeader>
                 <CardContent>
                     <ul>
-                        <li className="flex">
+                        <li className="hidden sm:flex">
                             <span className="flex-1">Date</span>
                             <span className="flex-1">Type</span>
+                            <span className="flex-1">Amount</span>
                             <span className="flex-1">Category Id</span>
                             <span className="flex-1">User Id</span>
                             <span className="flex-1">Description</span>
-                            <span className="flex-1">Amount</span>
                         </li>
                         {record}
                     </ul>
