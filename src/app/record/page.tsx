@@ -78,7 +78,7 @@ const Page = function Records() {
                 </div>
                 <div className="grid w-full max-w-sm items-center gap-1.5 mb-3">
                     <Label htmlFor="amount">Amount</Label>
-                    <Input type="number" id="amount" placeholder="Amount" value={amountInput} onChange={(event)=>setAmountInput(event.target.value)} />
+                    <Input type="number" id="amount" placeholder="Amount" value={amountInput} onChange={(event)=>setAmountInput(parseFloat(event.target.value))} />
                 </div>
                 <div className="grid w-full max-w-sm items-center gap-1.5 mb-3">
                     <Label htmlFor="description">Description</Label>
