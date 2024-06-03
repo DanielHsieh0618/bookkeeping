@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-
+import { sql } from "@vercel/postgres";
 /**
  * This page component acts as a root-level page for locale redirection.
  * If the locale cookie isn't set, it redirects the user to the default one.
