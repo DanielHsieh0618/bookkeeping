@@ -23,8 +23,6 @@ export default async function Home() {
             <span className="flex-1">{new Date(record.record_date).toLocaleDateString()}</span>
             <span className="flex-1">{record.record_type}</span>
             <span className="flex-1">{record.amount}</span>
-            <span className="flex-1">{record.category_id}</span>
-            <span className="flex-1">{record.user_id}</span>
             <span className="flex-1">{record.description} </span>
         </li>
     ));
@@ -59,8 +57,6 @@ export default async function Home() {
                             <span className="flex-1">Date</span>
                             <span className="flex-1">Type</span>
                             <span className="flex-1">Amount</span>
-                            <span className="flex-1">Category Id</span>
-                            <span className="flex-1">User Id</span>
                             <span className="flex-1">Description</span>
                         </li>
                         {record}
