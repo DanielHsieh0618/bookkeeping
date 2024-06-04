@@ -11,3 +11,9 @@ export async function POST(req: Request, res: Response) {
         `;
   return NextResponse.json({ message: "Success" }, { status: 200 });
 }
+
+// To handle a POST request to /api
+export async function GET(req: Request, res: Response) {
+    const { rows } = await sql`SELECT * FROM records;`;
+  return NextResponse.json(rows, { status: 200 });
+}
