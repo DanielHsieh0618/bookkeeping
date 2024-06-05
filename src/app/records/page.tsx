@@ -13,6 +13,9 @@ import {
 } from "@/components/ui/card";
 import { sql } from "@vercel/postgres";
 
+// this line force to execute sql every times
+export const fetchCache = 'force-no-store';
+
 export default async function Home() {
 
     
