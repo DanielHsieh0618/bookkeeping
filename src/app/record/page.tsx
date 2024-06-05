@@ -31,10 +31,12 @@ const Page = function Records() {
     const [typeInput, setTypeInput] = useState("expenses");
     const [descriptionInput, setDescriptionInput] = useState("");
     const [amountInput, setAmountInput] = useState(0);
+    const [loading, setLoading] = useState(false)
 
     const router = useRouter()
 
     async function addRecord() {
+        setLoading(true)
         const data = {
             userId: 1,
             categoryId: 1,
@@ -43,18 +45,25 @@ const Page = function Records() {
             amount: amountInput,
             recordDate: new Date().toDateString(),
         }
-        await fetch("/api/records", {
-            method: "POST",
-            credentials: "same-origin",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            redirect: "follow",
-            referrerPolicy: "no-referrer",
-            body: JSON.stringify(data), // body data type must match "Content-Type" header
-        });
-
-        router.push("/")
+        try {
+            await fetch("/api/records", {
+                method: "POST",
+                credentials: "same-origin",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                redirect: "follow",
+                referrerPolicy: "no-referrer",
+                body: JSON.stringify(data), // body data type must match "Content-Type" header
+            });
+            setLoading(false)
+            // force refresh
+            router.push("/")
+            router.refresh()
+        } catch (error) {
+            console.error("Error:", error)
+            setLoading(false)
+        } 
     }
 
 
@@ -91,7 +100,7 @@ const Page = function Records() {
                         Cancel
                     </Button>
                 </Link>
-                <Button className="flex-1" onClick={addRecord} >
+                <Button className="flex-1" disabled={loading} onClick={addRecord} >
                     Add
                 </Button>
             </CardFooter>

@@ -11,17 +11,19 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { sql } from "@vercel/postgres";
+import { headers } from 'next/headers';
+import { Key, ReactElement, JSXElementConstructor, ReactNode, ReactPortal, AwaitedReactNode } from "react";
 
 // this line force to execute sql every times
 export const fetchCache = 'force-no-store';
 
 export default async function Home() {
 
-    
-    const { rows } = await sql`SELECT * FROM records;`;
-
-    const record = rows.map((record) => (
+    // fetch data from api
+    const headersList = headers();
+    const res = await fetch(`https://${headersList.get('host')}/api/records`)
+    const rows = await res.json()
+    const record = rows.map((record: { record_id: Key | null | undefined; record_date: string | number | Date; record_type: string | number | bigint | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode> | null | undefined; amount: string | number | bigint | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode> | null | undefined; description: string | number | bigint | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode> | null | undefined; }) => (
         <li key={record.record_id} className="flex">
             <span className="flex-1">{new Date(record.record_date).toLocaleDateString()}</span>
             <span className="flex-1">{record.record_type}</span>
