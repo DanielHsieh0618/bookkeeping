@@ -11,7 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { headers } from 'next/headers';
+// import { headers } from 'next/headers';
 
 interface Record {
     record_id: string;
@@ -28,19 +28,19 @@ export default async function Home() {
     let records: Record[] = [];
 
     // fetch data from api
-    const headersList = headers();
+    // const headersList = headers();
 
-    async function fetchRecords() {
-        const res = await fetch(`https://${headersList.get('host')}/api/records`, { 
-            headers: {
-                accept: 'application/json',
-            }
-        })
-        const rows = await res.json()
-        records = rows
-    }
+    // async function fetchRecords() {
+    //     const res = await fetch(`https://${headersList.get('host')}/api/records`, { 
+    //         headers: {
+    //             accept: 'application/json',
+    //         }
+    //     })
+    //     const rows = await res.json()
+    //     records = rows
+    // }
     
-    await fetchRecords()
+    // await fetchRecords()
 
     let recordList = null;
     
@@ -90,7 +90,7 @@ export default async function Home() {
                             <span className="flex-1">Amount</span>
                             <span className="flex-1">Description</span>
                         </li>
-                        {/* {recordList} */}
+                        {recordList}
                     </ul>
                 </CardContent>
             </Card>
