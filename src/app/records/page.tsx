@@ -42,20 +42,20 @@ export default async function Home() {
     
     // await fetchRecords()
 
-    let recordList: JSX.Element[] = [];
+    // let recordList: JSX.Element[] = [];
     
-    try {
-        recordList = records.map((record: Record) => (
-            <li key={record.record_id} className="flex">
-                <span className="flex-1">{new Date(record.record_date).toLocaleDateString()}</span>
-                <span className="flex-1">{record.record_type}</span>
-                <span className="flex-1">{record.amount}</span>
-                <span className="flex-1">{record.description} </span>
-            </li>
-        ));
-    } catch {
-        console.error('Error in rendering records')
-    }
+    // try {
+    //     recordList = records.map((record: Record) => (
+    //         <li key={record.record_id} className="flex">
+    //             <span className="flex-1">{new Date(record.record_date).toLocaleDateString()}</span>
+    //             <span className="flex-1">{record.record_type}</span>
+    //             <span className="flex-1">{record.amount}</span>
+    //             <span className="flex-1">{record.description} </span>
+    //         </li>
+    //     ));
+    // } catch {
+    //     console.error('Error in rendering records')
+    // }
     
 
     return (
