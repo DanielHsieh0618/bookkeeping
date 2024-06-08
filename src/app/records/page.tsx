@@ -21,7 +21,11 @@ export default async function Home() {
 
     // fetch data from api
     const headersList = headers();
-    const res = await fetch(`https://${headersList.get('host')}/api/records`)
+    const res = await fetch(`https://${headersList.get('host')}/api/records`, { 
+        headers: {
+             accept: 'application/json',
+        }
+    })
     const rows = await res.json()
 
     interface Record {
