@@ -42,7 +42,7 @@ export default async function Home() {
     
     // await fetchRecords()
 
-    let recordList: JSX.Element[] = [];
+    let recordList = '';
     
     // try {
     //     recordList = records.map((record: Record) => (
