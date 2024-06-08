@@ -14,7 +14,7 @@ import {
 
 import Image from "next/image"
 
-import { ThemeProvider } from "@/components/theme-provider"
+// import { ThemeProvider } from "@/components/theme-provider"
 import { DarkModeToggle } from "@/components/dark-mode-toggle"
 
 const fontSans = FontSans({
@@ -40,12 +40,12 @@ export default function RootLayout({
           fontSans.variable
         )}
       >
-        <ThemeProvider
+        {/* <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
-        >
+        > */}
           <NavigationMenu className="p-3 flex justify-between" >
             <NavigationMenuList>
               <NavigationMenuItem>
@@ -62,7 +62,7 @@ export default function RootLayout({
           <main className="custom-min-h-dvh px-3 pb-3 flex gap-3 flex-col sm:flex-row items-stretch">
             {children}
           </main>
-        </ThemeProvider>
+        {/* </ThemeProvider> */}
       </body>
     </html>
   );
