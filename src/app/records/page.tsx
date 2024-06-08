@@ -42,7 +42,7 @@ export default async function Home() {
     
     // await fetchRecords()
 
-    let recordList = null;
+    let recordList: JSX.Element[] = [];
     
     try {
         recordList = records.map((record: Record) => (
@@ -54,7 +54,7 @@ export default async function Home() {
             </li>
         ));
     } catch {
-        recordList = <li> oops! </li>
+        console.error('Error in rendering records')
     }
     
 
@@ -90,7 +90,7 @@ export default async function Home() {
                             <span className="flex-1">Amount</span>
                             <span className="flex-1">Description</span>
                         </li>
-                        {recordList}
+                        {/* {recordList} */}
                     </ul>
                 </CardContent>
             </Card>
