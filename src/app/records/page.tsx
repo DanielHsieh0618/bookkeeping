@@ -13,30 +13,36 @@ import {
 } from "@/components/ui/card";
 import { headers } from 'next/headers';
 
+interface Record {
+    record_id: string;
+    record_date: string;
+    record_type: string;
+    amount: number;
+    description: string;
+}
+
 // this line force to execute sql every times
 export const fetchCache = 'force-no-store';
 
 export default async function Home() {
-    let records: JSX.Element[] = [];
+    let records: Record[] = [];
 
     // fetch data from api
     const headersList = headers();
-    const res = await fetch(`https://${headersList.get('host')}/api/records`, { 
-        headers: {
-             accept: 'application/json',
-        }
-    })
-    const rows = await res.json()
 
-    interface Record {
-        record_id: string;
-        record_date: string;
-        record_type: string;
-        amount: number;
-        description: string;
+    async function fetchRecords() {
+        const res = await fetch(`https://${headersList.get('host')}/api/records`, { 
+            headers: {
+                accept: 'application/json',
+            }
+        })
+        const rows = await res.json()
+        records = rows
     }
+    
+    await fetchRecords()
 
-    records = rows.map((record: Record) => (
+    const recordList = records.map((record: Record) => (
         <li key={record.record_id} className="flex">
             <span className="flex-1">{new Date(record.record_date).toLocaleDateString()}</span>
             <span className="flex-1">{record.record_type}</span>
@@ -77,9 +83,7 @@ export default async function Home() {
                             <span className="flex-1">Amount</span>
                             <span className="flex-1">Description</span>
                         </li>
-                    </ul>
-                    <ul>
-                        {records}
+                        {recordList}
                     </ul>
                 </CardContent>
             </Card>
