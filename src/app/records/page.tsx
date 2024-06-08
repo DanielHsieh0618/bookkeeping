@@ -17,6 +17,7 @@ import { headers } from 'next/headers';
 export const fetchCache = 'force-no-store';
 
 export default async function Home() {
+    let records: JSX.Element[] = [];
 
     // fetch data from api
     const headersList = headers();
@@ -31,7 +32,7 @@ export default async function Home() {
         description: string;
     }
 
-    const record: JSX.Element[] = rows.map((record: Record) => (
+    records = rows.map((record: Record) => (
         <li key={record.record_id} className="flex">
             <span className="flex-1">{new Date(record.record_date).toLocaleDateString()}</span>
             <span className="flex-1">{record.record_type}</span>
@@ -72,7 +73,9 @@ export default async function Home() {
                             <span className="flex-1">Amount</span>
                             <span className="flex-1">Description</span>
                         </li>
-                        {record}
+                    </ul>
+                    <ul>
+                        {records}
                     </ul>
                 </CardContent>
             </Card>
