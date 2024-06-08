@@ -11,7 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { headers } from 'next/headers';
+// import { headers } from 'next/headers';
 
 interface Record {
     record_id: string;
@@ -21,6 +21,8 @@ interface Record {
     description: string;
 }
 
+import {QueryResultRow, sql} from "@vercel/postgres";
+
 // this line force to execute sql every times
 export const fetchCache = 'force-no-store';
 
@@ -28,19 +30,26 @@ export default async function Home(): Promise<JSX.Element> {
     let records: Record[] = [];
 
     // fetch data from api
-    const headersList = headers();
+    // const headersList = headers();
 
-    async function fetchRecords() {
-        const res = await fetch(`https://${headersList.get('host')}/api/records`, { 
-            headers: {
-                accept: 'application/json',
-            }
-        })
-        return await res.json();
-    }
+    // async function fetchRecords() {
+    //     const res = await fetch(`https://${headersList.get('host')}/api/records`, { 
+    //         headers: {
+    //             accept: 'application/json',
+    //         }
+    //     })
+    //     return await res.json();
+    // }
     
-    records = await fetchRecords()
-
+    // records = await fetchRecords()
+    const { rows } = await sql`SELECT * FROM records;`;
+    records = rows.map((row: QueryResultRow) => ({
+        record_id: row.record_id,
+        record_date: row.record_date,
+        record_type: row.record_type,
+        amount: row.amount,
+        description: row.description,
+    }));
     let recordList: JSX.Element[] = [];
     
     try {
