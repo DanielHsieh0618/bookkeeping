@@ -11,7 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-// import { headers } from 'next/headers';
+import { headers } from 'next/headers';
 
 interface Record {
     record_id: string;
@@ -24,38 +24,37 @@ interface Record {
 // this line force to execute sql every times
 export const fetchCache = 'force-no-store';
 
-export default async function Home() {
+export default async function Home(): Promise<JSX.Element> {
     let records: Record[] = [];
 
     // fetch data from api
-    // const headersList = headers();
+    const headersList = headers();
 
-    // async function fetchRecords() {
-    //     const res = await fetch(`https://${headersList.get('host')}/api/records`, { 
-    //         headers: {
-    //             accept: 'application/json',
-    //         }
-    //     })
-    //     const rows = await res.json()
-    //     records = rows
-    // }
+    async function fetchRecords() {
+        const res = await fetch(`https://${headersList.get('host')}/api/records`, { 
+            headers: {
+                accept: 'application/json',
+            }
+        })
+        return await res.json();
+    }
     
-    // await fetchRecords()
+    records = await fetchRecords()
 
-    let recordList = '';
+    let recordList: JSX.Element[] = [];
     
-    // try {
-    //     recordList = records.map((record: Record) => (
-    //         <li key={record.record_id} className="flex">
-    //             <span className="flex-1">{new Date(record.record_date).toLocaleDateString()}</span>
-    //             <span className="flex-1">{record.record_type}</span>
-    //             <span className="flex-1">{record.amount}</span>
-    //             <span className="flex-1">{record.description} </span>
-    //         </li>
-    //     ));
-    // } catch {
-    //     console.error('Error in rendering records')
-    // }
+    try {
+        recordList = records.map((record: Record) => (
+            <li key={record.record_id} className="flex">
+                <span className="flex-1">{new Date(record.record_date).toLocaleDateString()}</span>
+                <span className="flex-1">{record.record_type}</span>
+                <span className="flex-1">{record.amount}</span>
+                <span className="flex-1">{record.description} </span>
+            </li>
+        ));
+    } catch {
+        console.error('Error in rendering records')
+    }
     
 
     return (
@@ -90,7 +89,7 @@ export default async function Home() {
                             <span className="flex-1">Amount</span>
                             <span className="flex-1">Description</span>
                         </li>
-                        {recordList}
+                        {recordList?.length === 0 ? <li>No records</li> : recordList}
                     </ul>
                 </CardContent>
             </Card>
