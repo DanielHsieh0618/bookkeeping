@@ -42,14 +42,21 @@ export default async function Home() {
     
     await fetchRecords()
 
-    const recordList = records.map((record: Record) => (
-        <li key={record.record_id} className="flex">
-            <span className="flex-1">{new Date(record.record_date).toLocaleDateString()}</span>
-            <span className="flex-1">{record.record_type}</span>
-            <span className="flex-1">{record.amount}</span>
-            <span className="flex-1">{record.description} </span>
-        </li>
-    ));
+    let recordList = null;
+    
+    try {
+        recordList = records.map((record: Record) => (
+            <li key={record.record_id} className="flex">
+                <span className="flex-1">{new Date(record.record_date).toLocaleDateString()}</span>
+                <span className="flex-1">{record.record_type}</span>
+                <span className="flex-1">{record.amount}</span>
+                <span className="flex-1">{record.description} </span>
+            </li>
+        ));
+    } catch {
+        recordList = <li> oops! </li>
+    }
+    
 
     return (
         <>
