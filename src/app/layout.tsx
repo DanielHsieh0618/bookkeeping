@@ -1,4 +1,4 @@
-import type { Metadata, ResolvedMetadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter as FontSans } from "next/font/google"
 import "../styles/globals.css";
 
@@ -24,14 +24,15 @@ const fontSans = FontSans({
 
 export const metadata: Metadata = {
   title: "Bookkeeping",
-  description: "A simple bookkeeping app",
-  viewport: {
+  description: "A simple bookkeeping app"
+};
+
+export const viewport: Viewport = {
     width: "device-width", 
     initialScale: 1, 
     maximumScale: 1, 
     userScalable: false,
     viewportFit: 'auto'
-  }
 };
 
 export default function RootLayout({
