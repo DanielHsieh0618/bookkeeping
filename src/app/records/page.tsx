@@ -42,7 +42,7 @@ export default async function Home(): Promise<JSX.Element> {
     // }
     
     // records = await fetchRecords()
-    const { rows } = await sql`SELECT * FROM records;`;
+ const { rows } = await sql`SELECT * FROM records ORDER BY record_date DESC;`;
     records = rows.map((row: QueryResultRow) => ({
         record_id: row.record_id,
         record_date: row.record_date,
