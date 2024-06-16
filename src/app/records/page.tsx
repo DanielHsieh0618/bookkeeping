@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { Chart } from "@/components/chart";
 import { CirclePlus } from 'lucide-react';
 import {
   Card,
@@ -23,7 +24,7 @@ export default async function Home() {
     const headersList = headers();
     const res = await fetch(`https://${headersList.get('host')}/api/records`)
     const rows = await res.json()
-    const record = rows.map((record: { record_id: Key | null | undefined; record_date: string | number | Date; record_type: string | number | bigint | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode> | null | undefined; amount: string | number | bigint | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode> | null | undefined; description: string | number | bigint | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode> | null | undefined; }) => (
+    const recordStr = rows.map((record: { record_id: Key | null | undefined; record_date: string | number | Date; record_type: string | number | bigint | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode> | null | undefined; amount: string | number | bigint | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode> | null | undefined; description: string | number | bigint | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode> | null | undefined; }) => (
         <li key={record.record_id} className="flex">
             <span className="flex-1">{new Date(record.record_date).toLocaleDateString()}</span>
             <span className="flex-1">{record.record_type}</span>
@@ -40,10 +41,9 @@ export default async function Home() {
                     <CardDescription>Chart Description</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <p>Chart Content</p>
+                <Chart records={rows}></Chart>
                 </CardContent>
                 <CardFooter>
-                    <p>Chart Footer</p>
                 </CardFooter>
             </Card>
 
@@ -64,7 +64,7 @@ export default async function Home() {
                             <span className="flex-1">Amount</span>
                             <span className="flex-1">Description</span>
                         </li>
-                        {record}
+                        {recordStr}
                     </ul>
                 </CardContent>
             </Card>
