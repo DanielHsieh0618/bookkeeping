@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { Chart } from "@/components/chart";
 import { CirclePlus } from 'lucide-react';
 import {
   Card,
@@ -29,7 +30,6 @@ export const fetchCache = 'force-no-store';
 export default async function Home(): Promise<JSX.Element> {
     let records: Record[] = [];
 
-    // fetch data from api
     // const headersList = headers();
 
     // async function fetchRecords() {
@@ -64,7 +64,6 @@ export default async function Home(): Promise<JSX.Element> {
     } catch {
         console.error('Error in rendering records')
     }
-    
 
     return (
         <>
@@ -74,10 +73,9 @@ export default async function Home(): Promise<JSX.Element> {
                     <CardDescription>Chart Description</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <p>Chart Content</p>
+                <Chart records={rows}></Chart>
                 </CardContent>
                 <CardFooter>
-                    <p>Chart Footer</p>
                 </CardFooter>
             </Card>
 
@@ -98,7 +96,7 @@ export default async function Home(): Promise<JSX.Element> {
                             <span className="flex-1">Amount</span>
                             <span className="flex-1">Description</span>
                         </li>
-                        {recordList?.length === 0 ? <li>No records</li> : recordList}
+                         {recordList?.length === 0 ? <li>No records</li> : recordList}
                     </ul>
                 </CardContent>
             </Card>

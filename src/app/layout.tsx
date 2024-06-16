@@ -67,7 +67,7 @@ export default function RootLayout({
             </NavigationMenuList>
             <DarkModeToggle></DarkModeToggle>
           </NavigationMenu>
-          <main className="custom-min-h-dvh px-3 pb-3 flex gap-3 flex-col sm:flex-row items-stretch">
+          <main className="custom-min-h-dvh px-3 pb-3 flex gap-3 flex-col sm:flex-col items-stretch">
             {children}
           </main>
         </ThemeProvider>
