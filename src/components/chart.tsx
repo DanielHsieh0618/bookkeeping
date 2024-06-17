@@ -31,7 +31,7 @@ const Chart: React.FC<ChartProps> = ({ records }) => {
         // Draw the chart
         myChart.setOption({
           title: {
-            text: 'Expenses by Category'
+            text: 'Expenses or Incomes by Category'
           },
           tooltip: {},
           xAxis: {
@@ -40,7 +40,7 @@ const Chart: React.FC<ChartProps> = ({ records }) => {
           yAxis: {},
           series: [
             {
-              name: 'sales',
+              name: 'expenses',
               type: 'bar',
               data: Object.values(groupByCategory)
             }
