@@ -15,19 +15,23 @@ const Chart: React.FC<ChartProps> = ({ records }) => {
 
 
     useEffect(() => {
-    const expensesRecords = records.filter(record => record.record_type === "expenses");
-    const groupByCategory = expensesRecords.reduce((acc, record) => {
-        if (!acc[record.record_type]) {
-            acc[record.record_type] = 0;
-        }
-        acc[record.record_type] += record.amount;
-        return acc;
-    }
-    , {});
+    // const expensesRecords = records.filter(record => record.record_type === "expenses");
+    // const groupByCategory = expensesRecords.reduce((acc, record) => {
+    //     if (!acc[record.record_type]) {
+    //         acc[record.record_type] = 0;
+    //     }
+    //     acc[record.record_type] += record.amount;
+    //     return acc;
+    // }
+    // , {});
     
     return () => {
         // Create the echarts instance
+
+        console.log("chartRef.current", chartRef.current)
         var myChart = echarts.init(chartRef.current);
+
+        console.log(myChart)
         // Draw the chart
         myChart.setOption({
           title: {
@@ -35,14 +39,14 @@ const Chart: React.FC<ChartProps> = ({ records }) => {
           },
           tooltip: {},
           xAxis: {
-            data: Object.keys(groupByCategory)
+            data: ["apple", "banana", "egg"]// Object.keys(groupByCategory)
           },
           yAxis: {},
           series: [
             {
               name: 'sales',
               type: 'bar',
-              data: Object.values(groupByCategory)
+              data: [2,3,45] // Object.values(groupByCategory)
             }
           ]
         });
