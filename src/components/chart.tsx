@@ -12,7 +12,7 @@ interface ChartProps {
 const Chart: React.FC<ChartProps> = ({ records }) => {
 
     const chartRef = useRef<HTMLDivElement | null>(null);
-
+    console.log("chartRef.current", chartRef)
 
     useEffect(() => {
     // const expensesRecords = records.filter(record => record.record_type === "expenses");
@@ -24,11 +24,11 @@ const Chart: React.FC<ChartProps> = ({ records }) => {
     //     return acc;
     // }
     // , {});
-    
+    console.log("chartRef.current", chartRef?.current)
     return () => {
         // Create the echarts instance
 
-        console.log("chartRef.current", chartRef.current)
+        console.log("chartRef.current", chartRef?.current)
         var myChart = echarts.init(chartRef.current);
 
         console.log(myChart)
