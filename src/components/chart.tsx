@@ -42,12 +42,15 @@ interface ChartProps {
 
 const Chart: React.FC<ChartProps> = (props) => {
     const  {records} = props; 
-    const expensesRecords = records.filter(record => record.record_type === "expenses");
-    const groupByCategory = expensesRecords.reduce((acc, record) => {
-        if (!acc[record.record_type]) {
-            acc[record.record_type] = 0;
+    // const expensesRecords = records.filter(record => record.record_type === "expenses");
+    const groupByTypeAndCategory = records.reduce((acc, record) => {
+      if (!acc[record.record_type]) {
+          acc[record.record_type] = {};
+      }
+        if (!acc[record.record_type][record.category_id]) {
+            acc[record.record_type][record.category_id] = 0;
         }
-        acc[record.record_type] += record.amount;
+        acc[record.record_type][record.category_id] += record.amount;
         return acc;
     }
     , {});
@@ -61,20 +64,22 @@ const Chart: React.FC<ChartProps> = (props) => {
       // Draw the chart
       myChart.setOption({
         title: {
-          text: 'Expenses by Category'
+          text: 'Monthly'
         },
         tooltip: {},
         xAxis: {
-          data:  Object.keys(groupByCategory)
+          data:  Object.keys(groupByTypeAndCategory[Object.keys(groupByTypeAndCategory)[0]])
         },
         yAxis: {},
-        series: [
-          {
-            name: 'sales',
+        series: Object.keys(groupByTypeAndCategory).map((type) => {
+          return {
+            name: type,
             type: 'bar',
-            data:  Object.values(groupByCategory)
+            data: Object.keys(groupByTypeAndCategory[type]).map((category) => {
+              return groupByTypeAndCategory[type][category];
+            })
           }
-        ]
+        })
       });
     return () => {
         myChart.dispose();

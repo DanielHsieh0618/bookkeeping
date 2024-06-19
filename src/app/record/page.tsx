@@ -29,6 +29,7 @@ import { useState } from "react";
 const Page = function Records() {
 
     const [typeInput, setTypeInput] = useState("expenses");
+    const [categoryInput, setCategoryInput] = useState(1);
     const [descriptionInput, setDescriptionInput] = useState("");
     const [amountInput, setAmountInput] = useState(0);
     const [loading, setLoading] = useState(false)
@@ -39,7 +40,7 @@ const Page = function Records() {
         setLoading(true)
         const data = {
             userId: 1,
-            categoryId: 1,
+            categoryId: categoryInput,
             description: descriptionInput,
             recordType: typeInput,
             amount: amountInput,
@@ -86,8 +87,20 @@ const Page = function Records() {
                     </Select>
                 </div>
                 <div className="grid w-full max-w-sm items-center gap-1.5 mb-3">
+                    <Label htmlFor="type">Type</Label>
+                    <Select value={`${categoryInput}`} onValueChange={(val)=>setCategoryInput(Number(val))}>
+                        <SelectTrigger id="type" >
+                            <SelectValue placeholder="Select a Category" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="1">1</SelectItem>
+                            <SelectItem value="2">2</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+                <div className="grid w-full max-w-sm items-center gap-1.5 mb-3">
                     <Label htmlFor="amount">Amount</Label>
-                    <Input type="number" id="amount" placeholder="Amount" value={amountInput} onChange={(event)=>setAmountInput(parseFloat(event.target.value))} />
+                    <Input type="number" id="amount" placeholder="Amount" value={amountInput.toString()} onChange={(event)=>setAmountInput(parseFloat(event.target.value))} />
                 </div>
                 <div className="grid w-full max-w-sm items-center gap-1.5 mb-3">
                     <Label htmlFor="description">Description</Label>
