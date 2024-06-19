@@ -88,7 +88,7 @@ const Chart: React.FC<ChartProps> = ({ records }) => {
 
     return (
         <div className="w-full">
-            <div ref={chartRef} className="min-w-[860px] w-full h-64"></div>
+            <div ref={chartRef} className="w-full h-64"></div>
         </div>
     );
 };
