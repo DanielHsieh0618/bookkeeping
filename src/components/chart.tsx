@@ -40,7 +40,8 @@ interface ChartProps {
     records: any[];
 }
 
-const Chart: React.FC<ChartProps> = ({ records }) => {
+const Chart: React.FC<ChartProps> = () => {
+  // const  {records} = props; 
 
     const chartRef = useRef<HTMLDivElement | null>(null);
     console.log("chartRef.current", chartRef)
@@ -56,34 +57,31 @@ const Chart: React.FC<ChartProps> = ({ records }) => {
     // }
     // , {});
     console.log("chartRef.current", chartRef?.current)
-    return () => {
-        // Create the echarts instance
-
-        console.log("chartRef.current", chartRef?.current)
-        if (!chartRef.current) {
-          return ;
-        }
-        var myChart = echarts.init(chartRef?.current);
-        
-        // Draw the chart
-        myChart.setOption({
-          title: {
-            text: 'Expenses by Category'
-          },
-          tooltip: {},
-          xAxis: {
-            data: ["apple", "banana", "egg"]// Object.keys(groupByCategory)
-          },
-          yAxis: {},
-          series: [
-            {
-              name: 'sales',
-              type: 'bar',
-              data: [2,3,45] // Object.values(groupByCategory)
-            }
-          ]
-        });
+    var myChart = echarts.init(chartRef?.current);
+    if (!chartRef.current) {
+      return ;
     }
+      // Draw the chart
+      myChart.setOption({
+        title: {
+          text: 'Expenses by Category'
+        },
+        tooltip: {},
+        xAxis: {
+          data: ["apple", "banana", "egg"]// Object.keys(groupByCategory)
+        },
+        yAxis: {},
+        series: [
+          {
+            name: 'sales',
+            type: 'bar',
+            data: [2,3,45] // Object.values(groupByCategory)
+          }
+        ]
+      });
+    return () => {
+        myChart.dispose();
+      }
     }, [])
 
     return (
