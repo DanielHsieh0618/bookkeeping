@@ -40,50 +40,50 @@ interface ChartProps {
     records: any[];
 }
 
-const Chart: React.FC<ChartProps> = ({ records }) => {
-
+const Chart: React.FC<ChartProps> = (props) => {
+    const  {records} = props; 
+    // const expensesRecords = records.filter(record => record.record_type === "expenses");
+    const groupByTypeAndCategory = records.reduce((acc, record) => {
+      if (!acc[record.record_type]) {
+          acc[record.record_type] = {};
+      }
+        if (!acc[record.record_type][record.category_id]) {
+            acc[record.record_type][record.category_id] = 0;
+        }
+        acc[record.record_type][record.category_id] += record.amount;
+        return acc;
+    }
+    , {});
     const chartRef = useRef<HTMLDivElement | null>(null);
-    console.log("chartRef.current", chartRef)
 
     useEffect(() => {
-    // const expensesRecords = records.filter(record => record.record_type === "expenses");
-    // const groupByCategory = expensesRecords.reduce((acc, record) => {
-    //     if (!acc[record.record_type]) {
-    //         acc[record.record_type] = 0;
-    //     }
-    //     acc[record.record_type] += record.amount;
-    //     return acc;
-    // }
-    // , {});
-    console.log("chartRef.current", chartRef?.current)
-    return () => {
-        // Create the echarts instance
-
-        console.log("chartRef.current", chartRef?.current)
-        if (!chartRef.current) {
-          return ;
-        }
-        var myChart = echarts.init(chartRef?.current);
-        
-        // Draw the chart
-        myChart.setOption({
-          title: {
-            text: 'Expenses by Category'
-          },
-          tooltip: {},
-          xAxis: {
-            data: ["apple", "banana", "egg"]// Object.keys(groupByCategory)
-          },
-          yAxis: {},
-          series: [
-            {
-              name: 'sales',
-              type: 'bar',
-              data: [2,3,45] // Object.values(groupByCategory)
-            }
-          ]
-        });
+    var myChart = echarts.init(chartRef?.current);
+    if (!chartRef.current) {
+      return ;
     }
+      // Draw the chart
+      myChart.setOption({
+        title: {
+          text: 'Monthly'
+        },
+        tooltip: {},
+        xAxis: {
+          data:  Object.keys(groupByTypeAndCategory[Object.keys(groupByTypeAndCategory)[0]])
+        },
+        yAxis: {},
+        series: Object.keys(groupByTypeAndCategory).map((type) => {
+          return {
+            name: type,
+            type: 'bar',
+            data: Object.keys(groupByTypeAndCategory[type]).map((category) => {
+              return groupByTypeAndCategory[type][category];
+            })
+          }
+        })
+      });
+    return () => {
+        myChart.dispose();
+      }
     }, [])
 
     return (
