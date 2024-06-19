@@ -60,9 +60,11 @@ const Chart: React.FC<ChartProps> = ({ records }) => {
         // Create the echarts instance
 
         console.log("chartRef.current", chartRef?.current)
+        if (!chartRef.current) {
+          return ;
+        }
         var myChart = echarts.init(chartRef?.current);
-
-        console.log(myChart)
+        
         // Draw the chart
         myChart.setOption({
           title: {
