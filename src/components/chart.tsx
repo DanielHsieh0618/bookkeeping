@@ -1,96 +1,87 @@
+"use client";
 
-'use client';
-
-import * as React from 'react';
-import * as echarts from 'echarts/core';
-import { useRef, useEffect  } from 'react';
-import { BarChart } from 'echarts/charts';
-// Import the title, tooltip, rectangular coordinate system, dataset and transform components
+import * as React from "react";
+import * as echarts from "echarts/core";
+import { useRef, useEffect } from "react";
+import { PieChart, PieSeriesOption } from "echarts/charts";
+import { useTheme } from "next-themes";
 import {
+  LegendComponent,
   TitleComponent,
   TooltipComponent,
   GridComponent,
   DatasetComponent,
-  TransformComponent
-} from 'echarts/components';
+  TransformComponent,
+  LegendComponentOption,
+  TitleComponentOption,
+  TooltipComponentOption,
+  GridComponentOption,
+  DatasetComponentOption,
+} from "echarts/components";
 
 // Register the required components
 echarts.use([
-  BarChart,
+  PieChart,
+
   TitleComponent,
+  LegendComponent,
   TooltipComponent,
   GridComponent,
   DatasetComponent,
   TransformComponent,
   LabelLayout,
   UniversalTransition,
-  CanvasRenderer
+  CanvasRenderer,
 ]);
 
-
 // Features like Universal Transition and Label Layout
-import { LabelLayout, UniversalTransition } from 'echarts/features';
+import { LabelLayout, UniversalTransition } from "echarts/features";
 
 // Import the Canvas renderer
 // Note that including the CanvasRenderer or SVGRenderer is a required step
-import { CanvasRenderer } from 'echarts/renderers';
+import { CanvasRenderer } from "echarts/renderers";
 
+export type Option = echarts.ComposeOption<
+  | TitleComponentOption
+  | TooltipComponentOption
+  | GridComponentOption
+  | DatasetComponentOption
+  | LegendComponentOption
+  | PieSeriesOption
+>;
 
 interface ChartProps {
-    records: any[];
+  option: Option;
 }
 
 const Chart: React.FC<ChartProps> = (props) => {
-    const  {records} = props; 
-    // const expensesRecords = records.filter(record => record.record_type === "expenses");
-    const groupByTypeAndCategory = records.reduce((acc, record) => {
-      if (!acc[record.record_type]) {
-          acc[record.record_type] = {};
-      }
-        if (!acc[record.record_type][record.category_id]) {
-            acc[record.record_type][record.category_id] = 0;
-        }
-        acc[record.record_type][record.category_id] += record.amount;
-        return acc;
-    }
-    , {});
-    const chartRef = useRef<HTMLDivElement | null>(null);
-
-    useEffect(() => {
-    var myChart = echarts.init(chartRef?.current);
-    if (!chartRef.current) {
-      return ;
-    }
-      // Draw the chart
-      myChart.setOption({
-        title: {
-          text: 'Monthly'
-        },
-        tooltip: {},
-        xAxis: {
-          data:  Object.keys(groupByTypeAndCategory[Object.keys(groupByTypeAndCategory)[0]])
-        },
-        yAxis: {},
-        series: Object.keys(groupByTypeAndCategory).map((type) => {
-          return {
-            name: type,
-            type: 'bar',
-            data: Object.keys(groupByTypeAndCategory[type]).map((category) => {
-              return groupByTypeAndCategory[type][category];
-            })
-          }
-        })
-      });
-    return () => {
-        myChart.dispose();
-      }
-    }, [])
-
-    return (
-        <div className="w-full">
-            <div ref={chartRef} className="w-full h-64"></div>
-        </div>
+  const { option } = props;
+  const chartRef = useRef<HTMLDivElement | null>(null);
+  const { theme, systemTheme } = useTheme();
+  useEffect(() => {
+    const plot = echarts.init(
+      chartRef?.current,
+      theme?.includes("system") ? (systemTheme?.includes("dark") ? "dark" : "light") : theme
     );
+    // Draw the chart
+    plot.setOption(option);
+
+    const handleResize = () => {
+      plot.resize();
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      plot.dispose();
+    };
+  }, [option, theme, systemTheme]);
+
+  return (
+    <div className="w-full">
+      <div ref={chartRef} className="w-full h-64"></div>
+    </div>
+  );
 };
 
 export { Chart };
