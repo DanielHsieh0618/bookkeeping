@@ -35,7 +35,6 @@ const Page = function Record() {
           accept: "application/json",
         },
       });
-      console.log("res", res);
       return await res.json().then((categories) => {
         setCategories(categories);
       });
