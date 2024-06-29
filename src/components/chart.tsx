@@ -59,19 +59,23 @@ const Chart: React.FC<ChartProps> = (props) => {
   const chartRef = useRef<HTMLDivElement | null>(null);
   const { theme, systemTheme } = useTheme();
   useEffect(() => {
-    var myChart = echarts.init(
+    const plot = echarts.init(
       chartRef?.current,
       theme?.includes("system") ? (systemTheme?.includes("dark") ? "dark" : "light") : theme
     );
-    if (!chartRef.current) {
-      return;
-    }
     // Draw the chart
-    myChart.setOption(option);
-    return () => {
-      myChart.dispose();
+    plot.setOption(option);
+
+    const handleResize = () => {
+      plot.resize();
     };
-  }, [option, systemTheme, theme]);
+
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      plot.dispose();
+    };
+  }, [option, theme, systemTheme]);
 
   return (
     <div className="w-full">
