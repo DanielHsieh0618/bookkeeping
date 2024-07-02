@@ -17,5 +17,5 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
   },
-  secret: process.env.JWT_SECRET,
+  secret: process.env.JWT_SECRET || "default-secret"
 }
