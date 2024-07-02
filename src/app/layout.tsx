@@ -25,7 +25,7 @@ export const viewport: Viewport = {
 };
 
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/app/configs/auth";
 
 export default async function RootLayout({
   children,
