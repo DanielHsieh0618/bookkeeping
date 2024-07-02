@@ -1,76 +1,44 @@
 import type { Metadata, Viewport } from "next";
-import { Inter as FontSans } from "next/font/google"
+import { Inter as FontSans } from "next/font/google";
 import "../styles/globals.css";
 
-import { cn } from "@/lib/utils"
-import Link from "next/link"
+import { cn } from "@/lib/utils";
 
-import {
-  NavigationMenu,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList
-} from "@/components/ui/navigation-menu"
-
-import Image from "next/image"
-
-import { ThemeProvider } from "@/components/theme-provider"
-import { DarkModeToggle } from "@/components/dark-mode-toggle"
+import ClientLayout from "./client-layout";
 
 const fontSans = FontSans({
   subsets: ["latin"],
   variable: "--font-sans",
-})
+});
 
 export const metadata: Metadata = {
   title: "Bookkeeping",
-  description: "A simple bookkeeping app"
+  description: "A simple bookkeeping app",
 };
 
 export const viewport: Viewport = {
-    width: "device-width", 
-    initialScale: 1, 
-    maximumScale: 1, 
-    userScalable: false,
-    viewportFit: 'auto'
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "auto",
 };
 
-export default function RootLayout({
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await getServerSession(authOptions);
+  console.log("session", session);
+
   return (
     <html lang="en" suppressHydrationWarning>
-      <body 
-        className={cn(
-          "custom-min-h-dvh bg-background font-sans",
-          fontSans.variable
-        )}
-      >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <NavigationMenu className="p-3 flex justify-between" >
-            <NavigationMenuList>
-              <NavigationMenuItem>
-                <Link href="/" legacyBehavior passHref>
-                  <NavigationMenuLink className="flex items-center text-xl">
-                    <Image src="/piggy-bank.svg" alt="piggy-bookkeeping-icon" width={32} height={32} className="mr-1"/>
-                    豬豬記帳
-                  </NavigationMenuLink>
-                </Link>
-              </NavigationMenuItem>
-            </NavigationMenuList>
-            <DarkModeToggle></DarkModeToggle>
-          </NavigationMenu>
-          <main className="custom-min-h-dvh px-3 pb-3 flex gap-3 flex-col sm:flex-col items-stretch">
-            {children}
-          </main>
-        </ThemeProvider>
+      <body className={cn("custom-min-h-dvh bg-background font-sans", fontSans.variable)}>
+        <ClientLayout session={session}>{children}</ClientLayout>
       </body>
     </html>
   );
