@@ -30,7 +30,7 @@ export default function ClientLayout({ children, session }: { children: React.Re
               </Link>
             </NavigationMenuItem>
           </NavigationMenuList>
-          <div className="flex items-center">
+          <div className="flex items-center gap-2">
             <DarkModeToggle></DarkModeToggle>
             <LoginBtn></LoginBtn>
           </div>
