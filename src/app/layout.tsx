@@ -6,9 +6,6 @@ import { cn } from "@/lib/utils";
 
 import ClientLayout from "./client-layout";
 
-import { ThemeProvider } from "@/components/theme-provider";
-import { DarkModeToggle } from "@/components/dark-mode-toggle";
-
 const fontSans = FontSans({
   subsets: ["latin"],
   variable: "--font-sans",
