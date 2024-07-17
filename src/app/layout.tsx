@@ -33,8 +33,6 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const session = await getServerSession(authOptions);
-  console.log("session", session);
-
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={cn("custom-min-h-dvh bg-background font-sans", fontSans.variable)}>

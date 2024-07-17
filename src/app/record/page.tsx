@@ -12,6 +12,7 @@ import { Icon } from "@/components/ui/icon";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
 import dynamicIconImports from "lucide-react/dynamicIconImports";
 interface Category {
   category_id: number;
@@ -27,10 +28,13 @@ const Page = function Record() {
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
 
+  const { data: session } = useSession();
+  const userGoogleId = session?.user?.id;
+
   const router = useRouter();
   useEffect(() => {
     async function fetchCategories(userId: number = 1) {
-      const res = await fetch(`/api/users/${userId}/categories`, {
+      const res = await fetch(`/api/users/${userGoogleId}/categories`, {
         headers: {
           accept: "application/json",
         },
@@ -43,12 +47,11 @@ const Page = function Record() {
     return () => {
       setCategories([]);
     };
-  }, []);
+  }, [userGoogleId]);
 
   async function addRecord() {
     setLoading(true);
     const data = {
-      userId: 1,
       categoryId: categoryInput,
       description: descriptionInput,
       recordType: typeInput,
@@ -56,7 +59,7 @@ const Page = function Record() {
       recordDate: new Date().toDateString(),
     };
     try {
-      await fetch("/api/records", {
+      await fetch(`/api/users/${userGoogleId}/records`, {
         method: "POST",
         credentials: "same-origin",
         headers: {
