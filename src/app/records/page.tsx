@@ -1,14 +1,17 @@
+"use client";
+
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Chart } from "@/components/chart";
 import { CirclePlus } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-// import { headers } from 'next/headers';
 
 import * as echarts from "echarts/core";
 import { TooltipComponentOption, LegendComponentOption } from "echarts/components";
 import { PieSeriesOption } from "echarts/charts";
 
+import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
 type EChartsOption = echarts.ComposeOption<TooltipComponentOption | LegendComponentOption | PieSeriesOption>;
 
 enum RecordType {
@@ -25,35 +28,29 @@ interface Record {
   category_id: number;
 }
 
-import { QueryResultRow, sql } from "@vercel/postgres";
-
-// this line force to execute sql every times
 export const fetchCache = "force-no-store";
 
-export default async function Home(): Promise<JSX.Element> {
-  let records: Record[] = [];
+export default function Home(): JSX.Element {
+  const [records, setRecords] = useState([]);
+  const { data: session } = useSession();
+  const userGoogleId = session?.user?.id;
 
-  // const headersList = headers();
+  useEffect(() => {
+    async function fetchRecords() {
+      const res = await fetch(`/api/users/${userGoogleId}/records`, {
+        headers: {
+          accept: "application/json",
+        },
+      });
+      return setRecords(await res.json());
+    }
 
-  // async function fetchRecords() {
-  //     const res = await fetch(`https://${headersList.get('host')}/api/records`, {
-  //         headers: {
-  //             accept: 'application/json',
-  //         }
-  //     })
-  //     return await res.json();
-  // }
+    fetchRecords();
+    return () => {
+      setRecords([]);
+    };
+  }, [userGoogleId]);
 
-  // records = await fetchRecords()
-  const { rows } = await sql`SELECT * FROM records ORDER BY record_date DESC, record_id DESC;`;
-  records = rows.map((row: QueryResultRow) => ({
-    record_id: row.record_id,
-    record_date: row.record_date,
-    record_type: row.record_type,
-    category_id: row.category_id,
-    amount: row.amount,
-    description: row.description,
-  }));
   let recordList: JSX.Element[] = [];
 
   const groupByTypeAndCategory = records.reduce((acc: any, record: Record) => {
