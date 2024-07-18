@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 import { useState, useEffect } from "react";
 import dynamicIconImports from "lucide-react/dynamicIconImports";
+export const fetchCache = "force-no-store";
 interface Category {
   category_id: number;
   category_name: string;
