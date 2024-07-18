@@ -46,7 +46,7 @@ export const authOptions: NextAuthOptions = {
         if (users.length === 0) {
           await sql`INSERT INTO users (google_id, email, user_name, uuid) VALUES (${google_id}, ${user?.email}, ${user?.name}, ${uuidv4()});`;
           const { rows: users } = await sql`SELECT user_id FROM users WHERE google_id=${google_id};`;
-          await sql`INSERT INTO categories (user_id, category_name, category_icon) VALUES (${users[0].user_id}, 'Food', 'Apple');`;
+          await sql`INSERT INTO categories (user_id, category_name, category_icon) VALUES (${users[0].user_id}, 'Food', 'apple');`;
         }
       }
     },

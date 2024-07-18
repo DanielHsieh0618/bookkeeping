@@ -33,8 +33,8 @@ const Page = function Record() {
 
   const router = useRouter();
   useEffect(() => {
-    async function fetchCategories(userId: number = 1) {
-      const res = await fetch(`/api/users/${userGoogleId}/categories`, {
+    async function fetchCategories(googleId: string) {
+      const res = await fetch(`/api/users/${googleId}/categories`, {
         headers: {
           accept: "application/json",
         },
@@ -43,7 +43,7 @@ const Page = function Record() {
         setCategories(categories);
       });
     }
-    fetchCategories();
+    fetchCategories(userGoogleId);
     return () => {
       setCategories([]);
     };
