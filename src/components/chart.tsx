@@ -52,33 +52,34 @@ export type Option = echarts.ComposeOption<
 
 interface ChartProps {
   option: Option;
+  className: string;
 }
 
 const Chart: React.FC<ChartProps> = (props) => {
   const { option } = props;
   const chartRef = useRef<HTMLDivElement | null>(null);
   const { theme, systemTheme } = useTheme();
+  let chartInstance = useRef<echarts.ECharts | null>(null);
   useEffect(() => {
-    const plot = echarts.init(
-      chartRef?.current,
-      theme?.includes("system") ? (systemTheme?.includes("dark") ? "dark" : "light") : theme
-    );
-    // Draw the chart
-    plot.setOption(option);
+    if (chartRef && chartRef.current && theme) {
+      chartInstance.current = echarts.init(
+        chartRef.current,
+        theme.includes("system") ? (systemTheme?.includes("dark") ? "dark" : "light") : theme
+      );
+      // Draw the chart
+      chartInstance.current.setOption(option);
+      // handle resize
+      new ResizeObserver(() => chartInstance.current?.resize()).observe(chartRef.current);
+    }
 
-    const handleResize = () => {
-      plot.resize();
-    };
-
-    window.addEventListener("resize", handleResize);
     return () => {
-      window.removeEventListener("resize", handleResize);
-      plot.dispose();
+      // window.removeEventListener("resize", handleResize);
+      chartInstance.current?.dispose();
     };
   }, [option, theme, systemTheme]);
 
   return (
-    <div className="w-full">
+    <div className={`w-full sm:flex-1 sm:min-w-0 ${props.className}`}>
       <div ref={chartRef} className="w-full h-64"></div>
     </div>
   );

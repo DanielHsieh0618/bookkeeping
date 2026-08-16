@@ -11,7 +11,7 @@ import { Icon } from "@/components/ui/icon";
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useSession } from "next-auth/react";
 import dynamicIconImports from "lucide-react/dynamicIconImports";
 export const fetchCache = "force-no-store";
@@ -23,7 +23,7 @@ interface Category {
 
 const Page = function Record() {
   const [typeInput, setTypeInput] = useState("expenses");
-  const [categoryInput, setCategoryInput] = useState(1);
+  const [categoryInput, setCategoryInput] = useState<Number | null | undefined>(1);
   const [descriptionInput, setDescriptionInput] = useState("");
   const [amountInput, setAmountInput] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -80,6 +80,28 @@ const Page = function Record() {
     }
   }
 
+  function onTypeInputChange(val: string) {
+    setTypeInput(val);
+    if (val === "expenses") {
+      setCategoryInput(1);
+    } else {
+      setCategoryInput(0);
+    }
+  }
+
+  const categoryListOptions = useMemo(
+    () =>
+      categories.map((category: Category) => (
+        <SelectItem key={category.category_id} value={category.category_id.toString()}>
+          <div className="flex items-center">
+            <Icon name={category.category_icon} className="mr-2"></Icon>
+            <span>{category.category_name}</span>
+          </div>
+        </SelectItem>
+      )),
+    [categories]
+  );
+
   return (
     <Card className="flex-auto">
       <CardHeader>
@@ -88,7 +110,7 @@ const Page = function Record() {
       <CardContent>
         <div className="grid w-full max-w-sm items-center gap-1.5 mb-3">
           <Label htmlFor="type">Type</Label>
-          <Select value={typeInput} onValueChange={setTypeInput}>
+          <Select value={typeInput} onValueChange={onTypeInputChange}>
             <SelectTrigger id="type">
               <SelectValue placeholder="Select a Type" />
             </SelectTrigger>
@@ -98,24 +120,17 @@ const Page = function Record() {
             </SelectContent>
           </Select>
         </div>
-        <div className="grid w-full max-w-sm items-center gap-1.5 mb-3">
-          <Label htmlFor="category-id">Category</Label>
-          <Select value={`${categoryInput}`} onValueChange={(val) => setCategoryInput(Number(val))}>
-            <SelectTrigger id="category-id">
-              <SelectValue placeholder="Select a Category" />
-            </SelectTrigger>
-            <SelectContent>
-              {categories.map((category: Category) => (
-                <SelectItem key={category.category_id} value={category.category_id.toString()}>
-                  <div className="flex items-center">
-                    <Icon name={category.category_icon} className="mr-2"></Icon>
-                    <span>{category.category_name}</span>
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        {typeInput === "expenses" ? (
+          <div className="grid w-full max-w-sm items-center gap-1.5 mb-3">
+            <Label htmlFor="category-id">Category</Label>
+            <Select value={`${categoryInput}`} onValueChange={(val) => setCategoryInput(Number(val))}>
+              <SelectTrigger id="category-id">
+                <SelectValue placeholder="Select a Category" />
+              </SelectTrigger>
+              <SelectContent>{categoryListOptions}</SelectContent>
+            </Select>
+          </div>
+        ) : null}
         <div className="grid w-full max-w-sm items-center gap-1.5 mb-3">
           <Label htmlFor="amount">Amount</Label>
           <Input

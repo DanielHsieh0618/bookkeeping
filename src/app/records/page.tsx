@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Chart } from "@/components/chart";
-import { CirclePlus } from "lucide-react";
+import { CirclePlus, ChevronDown, ChevronUp } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 
 import * as echarts from "echarts/core";
@@ -32,6 +32,7 @@ export const fetchCache = "force-no-store";
 
 export default function Home(): JSX.Element {
   const [records, setRecords] = useState([]);
+  const [isMonthlyCollapsed, setIsMonthlyCollapsed] = useState(false);
   const { data: session } = useSession();
   const userGoogleId = session?.user?.id;
 
@@ -64,50 +65,99 @@ export default function Home(): JSX.Element {
     return acc;
   }, {});
 
-  let option: EChartsOption = {
-    title: Object.keys(groupByTypeAndCategory).map((recordType, idx) => ({
-      subtext: recordType,
-      textAlign: "center",
-      top: "85%",
-      left: `${idx === 0 ? 25 : 75}%`,
-    })),
-    tooltip: {
-      trigger: "item",
-    },
-    legend: {
-      show: false,
-    },
-    series: Object.keys(groupByTypeAndCategory).map((recordType, idx) => {
-      return {
-        name: recordType,
-        type: "pie",
-        radius: [30, 100],
-        center: [`${idx === 0 ? 25 : 75}%`, "45%"],
-        avoidLabelOverlap: false,
-        padAngle: 5,
-        itemStyle: {
-          borderRadius: 10,
-        },
-        label: {
-          show: false,
-          position: "center",
-        },
-        emphasis: {
-          label: {
-            show: true,
-            fontSize: 10,
-            fontWeight: "bold",
+  // let option: EChartsOption = {
+  //   title: Object.keys(groupByTypeAndCategory).map((recordType, idx) => ({
+  //     subtext: recordType,
+  //     textAlign: "center",
+  //     top: "85%",
+  //     left: `${idx === 0 ? 25 : 75}%`,
+  //   })),
+  //   tooltip: {
+  //     trigger: "item",
+  //   },
+  //   legend: {
+  //     show: false,
+  //   },
+  //   series: Object.keys(groupByTypeAndCategory).map((recordType, idx) => {
+  //     return {
+  //       name: recordType,
+  //       type: "pie",
+  //       radius: [30, 100],
+  //       center: [`${idx === 0 ? 25 : 75}%`, "45%"],
+  //       avoidLabelOverlap: false,
+  //       padAngle: 5,
+  //       itemStyle: {
+  //         borderRadius: 10,
+  //       },
+  //       label: {
+  //         show: false,
+  //         position: "center",
+  //       },
+  //       emphasis: {
+  //         label: {
+  //           show: true,
+  //           fontSize: 10,
+  //           fontWeight: "bold",
+  //         },
+  //       },
+  //       labelLine: {
+  //         show: false,
+  //       },
+  //       data: Object.keys(groupByTypeAndCategory[recordType]).map((category) => {
+  //         return { value: groupByTypeAndCategory[recordType][category], name: category };
+  //       }),
+  //     };
+  //   }),
+  // };
+
+  const chartOptions: EChartsOption[] = Object.keys(groupByTypeAndCategory).map((recordType, idx) => {
+    return {
+      title: {
+        subtext: recordType,
+        textAlign: "center",
+        top: "85%",
+        left: `50%`,
+      },
+      tooltip: {
+        trigger: "item",
+      },
+      legend: {
+        show: false,
+      },
+      series: [
+        {
+          name: recordType,
+          type: "pie",
+          radius: [30, 100],
+          // center: [`${idx === 0 ? 25 : 75}%`, "45%"],
+          // avoidLabelOverlap: false,
+          // padAngle: 5,
+          itemStyle: {
+            // borderRadius: 6,
+            borderColor: "#ffffff22",
+            borderWidth: 6,
           },
+          label: {
+            show: false,
+            position: "center",
+          },
+          emphasis: {
+            label: {
+              show: true,
+              fontSize: 10,
+              fontWeight: "bold",
+            },
+          },
+          labelLine: {
+            show: false,
+          },
+          data: Object.keys(groupByTypeAndCategory[recordType]).map((category) => {
+            return { value: groupByTypeAndCategory[recordType][category], name: category };
+          }),
         },
-        labelLine: {
-          show: false,
-        },
-        data: Object.keys(groupByTypeAndCategory[recordType]).map((category) => {
-          return { value: groupByTypeAndCategory[recordType][category], name: category };
-        }),
-      };
-    }),
-  };
+      ],
+    };
+  });
 
   try {
     recordList = records.map((record: Record) => (
@@ -122,17 +172,31 @@ export default function Home(): JSX.Element {
     console.error("Error in rendering records");
   }
 
+  const chartListItems = chartOptions.map((option, idx) => <Chart key={idx} option={option} className=""></Chart>);
+
   return (
     <>
-      <Card className="flex-auto">
-        <CardHeader>
-          <CardTitle>Monthly</CardTitle>
-          <CardDescription>Expenses and Income</CardDescription>
+      <Card className={isMonthlyCollapsed ? "flex-none" : "flex-auto"}>
+        <CardHeader className="flex-row items-start justify-between">
+          <div>
+            <CardTitle>Monthly</CardTitle>
+            <CardDescription>Expenses and Income</CardDescription>
+          </div>
+          <Button
+            variant="outline"
+            size="icon"
+            aria-label={isMonthlyCollapsed ? "Expand" : "Collapse"}
+            onClick={() => setIsMonthlyCollapsed(!isMonthlyCollapsed)}
+          >
+            {isMonthlyCollapsed ? <ChevronDown /> : <ChevronUp />}
+          </Button>
         </CardHeader>
-        <CardContent>
-          <Chart option={option}></Chart>
-        </CardContent>
-        <CardFooter></CardFooter>
+        {!isMonthlyCollapsed && (
+          <>
+            <CardContent className="flex flex-col sm:flex-row">{chartListItems}</CardContent>
+            <CardFooter></CardFooter>
+          </>
+        )}
       </Card>
 
       <Card className="flex-auto">
