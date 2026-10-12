@@ -1,0 +1,31 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: bookkeeping
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+  backend:
+    build:
+      context: ./apps/backend
+    command: ["uv", "run", "--no-sync", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "4000", "--reload", "--ssl-certfile=certificates/localhost.pem", "--ssl-keyfile=certificates/localhost-key.pem"]
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./apps/backend:/app
+      - backend_venv:/app/.venv
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/bookkeeping
+      JWT_SECRET: dev-jwt-secret
+      INTERNAL_API_SECRET: dev-internal-secret
+      FRONTEND_URL: https://localhost:3000
+    depends_on:
+      - postgres
+
+volumes:
+  pgdata:
+  backend_venv:

@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: bookkeeping-backend
+    runtime: docker
+    plan: free
+    # Same region as the Neon database (ap-southeast-1). Cannot be changed after creation.
+    region: singapore
+    dockerfilePath: ./apps/backend/Dockerfile
+    dockerContext: ./apps/backend
+    healthCheckPath: /health
+    autoDeployTrigger: commit
+    buildFilter:
+      paths:
+        - apps/backend/**
+        - render.yaml
+    envVars:
+      - key: PORT
+        value: 4000
+      # Entered in the Render dashboard when the Blueprint is first created.
+      - key: DATABASE_URL
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+      # Generated once by Render. Copy both values to Vercel:
+      # JWT_SECRET -> BACKEND_JWT_SECRET, INTERNAL_API_SECRET -> INTERNAL_API_SECRET.
+      - key: JWT_SECRET
+        generateValue: true
+      - key: INTERNAL_API_SECRET
+        generateValue: true
