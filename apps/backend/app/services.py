@@ -14,9 +14,12 @@ async def get_user_by_google_id(conn: AsyncConnection, google_id: str) -> dict |
 
 async def bootstrap_user(conn: AsyncConnection, *, google_id: str, email: str, user_name: str) -> None:
     cur = await conn.execute(
-        "INSERT INTO users (google_id, email, user_name, uuid) VALUES (%s, %s, %s, %s)"
-        " ON CONFLICT (google_id) DO NOTHING RETURNING user_id",
-        (google_id, email, user_name, str(uuid.uuid4())),
+        # NOT EXISTS covers databases with no unique constraint on google_id (the original
+        # production one); ON CONFLICT covers a concurrent insert where the constraint exists.
+        "INSERT INTO users (google_id, email, user_name, uuid)"
+        " SELECT %s, %s, %s, %s WHERE NOT EXISTS (SELECT 1 FROM users WHERE google_id = %s)"
+        " ON CONFLICT DO NOTHING RETURNING user_id",
+        (google_id, email, user_name, str(uuid.uuid4()), google_id),
     )
     created = await cur.fetchone()
     if created is None:

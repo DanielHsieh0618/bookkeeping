@@ -37,3 +37,19 @@ def test_bootstrap_is_idempotent(client, db):
 def test_missing_fields_are_422(client):
     response = client.post("/internal/users/bootstrap", json={"googleId": "g1"}, headers=HEADERS)
     assert response.status_code == 422
+
+
+def test_bootstrap_works_without_a_unique_constraint_on_google_id(client, db):
+    db.execute("ALTER TABLE users DROP CONSTRAINT users_google_id_key")
+    try:
+        first = client.post("/internal/users/bootstrap", json=BODY, headers=HEADERS)
+        second = client.post("/internal/users/bootstrap", json=BODY, headers=HEADERS)
+        users = db.execute("SELECT count(*) AS n FROM users").fetchone()["n"]
+        categories = db.execute("SELECT count(*) AS n FROM categories").fetchone()["n"]
+    finally:
+        db.execute("DELETE FROM categories")
+        db.execute("DELETE FROM users")
+        db.execute("ALTER TABLE users ADD CONSTRAINT users_google_id_key UNIQUE (google_id)")
+    assert first.status_code == 200
+    assert second.status_code == 200
+    assert (users, categories) == (1, 1)

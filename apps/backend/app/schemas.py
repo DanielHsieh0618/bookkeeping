@@ -1,3 +1,4 @@
+from datetime import date
 from decimal import Decimal
 from typing import Annotated
 
@@ -5,9 +6,12 @@ from dateutil import parser as date_parser
 from pydantic import BaseModel, Field, field_validator
 
 
+def format_date(value: date) -> str:
+    return f"{value.strftime('%a %b')} {value.day} {value.year}"
+
+
 def to_date_string(value: str) -> str:
-    dt = date_parser.parse(value)
-    return f"{dt.strftime('%a %b')} {dt.day} {dt.year}"
+    return format_date(date_parser.parse(value))
 
 
 class UserOut(BaseModel):
@@ -33,6 +37,12 @@ class RecordOut(BaseModel):
     category_id: int | None
     user_id: int
     description: str
+
+    # record_date is VARCHAR in schema.sql but a DATE column in the original production database.
+    @field_validator("record_date", mode="before")
+    @classmethod
+    def format_date_column(cls, value: object) -> object:
+        return format_date(value) if isinstance(value, date) else value
 
 
 class RecordCreate(BaseModel):
