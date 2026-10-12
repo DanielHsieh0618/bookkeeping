@@ -16,116 +16,90 @@ This project is a web application designed for managing financial records. It al
 
 ## Getting Started
 
-This section will guide you through setting up the project locally.
+This is a two-app monorepo: `apps/frontend` (Next.js, pnpm) and `apps/backend` (FastAPI, uv). They are **fully independent projects** — no shared workspace tooling ties them together, so each has its own dependency install step.
 
 ### Prerequisites
 
-Make sure you have the following installed on your system:
-- [Node.js](https://nodejs.org/) (version 18.x or later recommended)
-- npm (comes with Node.js), or alternatively [yarn](https://yarnpkg.com/), [pnpm](https://pnpm.io/), or [bun](https://bun.sh/)
+- [Node.js](https://nodejs.org/) 18.x+ and [pnpm](https://pnpm.io/) (`corepack enable && corepack prepare pnpm@9 --activate` if you don't have it)
+- [Python](https://www.python.org/) 3.12+ and [uv](https://docs.astral.sh/uv/)
+- [Docker](https://www.docker.com/) (for `docker compose`, used for local Postgres and/or the full backend stack)
 
 ### 1. Clone the Repository
 
-First, clone the project repository to your local machine:
 ```bash
 git clone <repository-url>
 cd <repository-name>
 ```
-Replace `<repository-url>` with the actual URL of the repository and `<repository-name>` with the name of the directory created.
 
 ### 2. Install Dependencies
 
-Install the project dependencies using your preferred package manager:
+Each project installs its own dependencies:
+
 ```bash
-npm install
-# or
-yarn install
-# or
-pnpm install
-# or
-bun install
+pnpm install                      # root: just `concurrently`, for `pnpm run dev`
+pnpm --dir apps/frontend install  # frontend's real dependencies
+cd apps/backend && uv sync        # backend's dependencies (creates apps/backend/.venv)
 ```
 
 ### 3. Environment Variables
 
-This project requires certain environment variables to be set up for local development. Create a file named `.env.local` in the root of your project and add the following variables:
+Two separate env files, one per app — see `apps/frontend/.env.example` and `apps/backend/.env.example` for the full list. Copy each to `.env.development.local` / `.env` and fill in real values.
 
-```env
-# Vercel Postgres Database Connection String
-POSTGRES_URL="your_postgres_connection_string"
+Key things to keep in sync between the two:
+- Frontend's `BACKEND_JWT_SECRET` must equal backend's `JWT_SECRET`.
+- Frontend's `INTERNAL_API_SECRET` must equal backend's `INTERNAL_API_SECRET`.
+- Frontend's `NEXT_PUBLIC_API_URL` must point at wherever the backend is actually listening (`https://localhost:4000` for local dev).
 
-# NextAuth.js secret for signing tokens
-AUTH_SECRET="your_random_auth_secret" # Generate a strong random string, e.g., using `openssl rand -hex 32`
-
-# Google OAuth Credentials (if you want to use Google login)
-# Obtain these from the Google Cloud Console: https://console.cloud.google.com/apis/credentials
-GOOGLE_CLIENT_ID="your_google_client_id"
-GOOGLE_CLIENT_SECRET="your_google_client_secret"
-
-# Application URL for NextAuth.js (especially for OAuth callbacks)
-NEXTAUTH_URL="http://localhost:3000" # Or https://localhost:3000 if using HTTPS
-```
-
-**How to get the values:**
-- `POSTGRES_URL`: You can get this connection string when you create a new Vercel Postgres database. For local development, you might connect to a local PostgreSQL instance or a free tier cloud-hosted one.
-- `AUTH_SECRET`: This is a critical security variable. Generate a long, random string.
-- `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`: Follow the NextAuth.js documentation or Google Cloud Console instructions to set up an OAuth 2.0 client.
-- `NEXTAUTH_URL`: This should be the base URL of your application. For local development, it's typically `http://localhost:3000`. If you are using `npm run dev --experimental-https` as suggested in `package.json`, this should be `https://localhost:3000`.
+`NEXTAUTH_SECRET`/`GOOGLE_CLIENT_ID`/`GOOGLE_CLIENT_SECRET` (frontend) and `DATABASE_URL` (backend) are unrelated to the two shared secrets above.
 
 ### 4. Database Setup
 
-This project uses Vercel Postgres.
-- **Schema Management**: The database schema is managed by Vercel based on your application's needs or through direct interaction with the Vercel dashboard.
-- **Seeding**: If you have initial data to populate (e.g., default categories, test users), you might need to run seed scripts. (Currently, no specific seed scripts are provided in this boilerplate. You would add them to your `package.json` and run them, for example, with `npm run seed`.)
+The backend owns the database — the frontend never talks to Postgres directly. The schema lives in `apps/backend/app/schema.sql` (`CREATE TABLE IF NOT EXISTS`) and is applied automatically every time the backend starts, so there is no separate migration step.
 
-For local development against a local Postgres instance, you would typically use a tool like `psql` or a GUI client to create your database and tables according to your application's models. However, when deploying to Vercel, Vercel Postgres will be the target.
+- Start Postgres with `docker compose up -d postgres`.
+- There is no migration tool: to change the schema, edit `schema.sql` for fresh databases, and for existing ones either add an idempotent `ALTER TABLE` to the end of `schema.sql` (as done for `records.category_id`) or apply it by hand.
 
 ### 5. Running the Development Server
 
-Once you have set up your environment variables, you can start the development server:
+From the repo root, `pnpm run dev` starts both apps concurrently (frontend on `https://localhost:3000`, backend on `https://localhost:4000` via uvicorn with `--reload`) — make sure Postgres is reachable first (`docker compose up -d postgres` is the easiest way).
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm run dev            # both apps
+pnpm run dev:frontend   # frontend only
+pnpm run dev:backend    # backend only
 ```
 
-This will typically start the application on `http://localhost:3000` or `https://localhost:3000` if using the `--experimental-https` flag. Open this URL in your browser to see the application.
+Alternatively, `docker compose up` runs Postgres + the backend as containers (frontend still runs on the host via `pnpm run dev:frontend`).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+The backend serves interactive API docs at `https://localhost:4000/docs`.
 
 ## Tech Stack
 
-This project utilizes the following key technologies and libraries:
-
-- **Framework:** [Next.js](https://nextjs.org/)
-- **UI Library:** [React](https://react.dev/)
-- **Language:** [TypeScript](https://www.typescriptlang.org/)
-- **Styling:** [Tailwind CSS](https://tailwindcss.com/)
-- **Authentication:** [NextAuth.js](https://next-auth.js.org/)
-- **Database:** [Vercel Postgres](https://vercel.com/storage/postgres)
-- **State Management:** [Zustand](https://zustand-demo.pmnd.rs/)
-- **Icons:** [Lucide React](https://lucide.dev/)
-- **UI Components:** [Radix UI](https://www.radix-ui.com/)
-- **Charts/Data Visualization:** [ECharts](https://echarts.apache.org/)
+- **Frontend:** [Next.js](https://nextjs.org/) (App Router), [React](https://react.dev/), [TypeScript](https://www.typescriptlang.org/), [Tailwind CSS](https://tailwindcss.com/), [NextAuth.js](https://next-auth.js.org/) (Google OAuth), [Zustand](https://zustand-demo.pmnd.rs/), [Radix UI](https://www.radix-ui.com/), [ECharts](https://echarts.apache.org/), managed with [pnpm](https://pnpm.io/).
+- **Backend:** [FastAPI](https://fastapi.tiangolo.com/) with raw SQL via [psycopg 3](https://www.psycopg.org/psycopg3/) (async connection pool) against Postgres, `PyJWT` for verifying the frontend-issued JWT, `uvicorn` as the server (dev and prod alike), managed with [uv](https://docs.astral.sh/uv/).
+- **Auth bridge:** NextAuth issues a short-lived JWT (`session.apiToken`) that the frontend sends as `Authorization: Bearer` on every backend call; the backend verifies it independently. A separate shared secret (`INTERNAL_API_SECRET`) guards the one pre-login bootstrap endpoint.
 
 ## Project Structure
 
-The project follows a structure conventional for Next.js applications using the App Router. Here's a brief overview of the main directories:
+```
+apps/
+  frontend/            Next.js app (pnpm project) — UI + NextAuth only, no DB access
+    src/app/            routes, pages, layout; src/app/api/auth is the only remaining API route (NextAuth)
+    src/components/     shared UI components
+    src/lib/            utilities
+  backend/              FastAPI app (uv project) — all DB access and business logic
+    app/main.py         app, lifespan (connection pool + schema), CORS, routers
+    app/routers/        HTTP endpoints
+    app/services.py     all SQL
+    app/auth.py         JWT and internal-secret dependencies
+    app/schema.sql      table definitions, applied on startup
+    tests/              pytest + TestClient against a real Postgres
+    Dockerfile
+docker-compose.yml      postgres + backend, for local Docker-based dev
+package.json            root: orchestration only (`concurrently`), not a workspace root
+```
 
--   **`src/app/`**: The heart of the application, containing all routing, pages, API endpoints, and layout components.
-    -   **`src/app/api/`**: Contains all server-side API route handlers. This is where your backend logic for data fetching and mutations resides.
-    -   **`src/app/auth/`**: Includes pages and components related to user authentication, such as login, registration, and session management.
-    -   **`src/app/(routes)/`**: This directory (or similar, based on route groups like `record/` and `records/`) houses the primary application routes like the dashboard, transaction records pages, etc. The parentheses denote a route group, which doesn't affect the URL path.
--   **`src/components/`**: Home to shared UI components used across multiple parts of the application.
-    -   **`src/components/ui/`**: Typically contains UI primitives and components, often from libraries like Shadcn/UI, Radix UI, or custom-built base components.
--   **`src/lib/`**: A collection of utility functions, helper scripts, type definitions, and client-side configuration files (e.g., `src/lib/utils.ts`, `src/lib/authOptions.ts`).
--   **`src/styles/`**: Contains global stylesheets, Tailwind CSS configuration (`tailwind.config.js` is usually at the root, but global CSS might be here), and font definitions.
--   **`public/`**: Stores static assets that are served directly, such as images, favicons, and other public files.
+See [docs/plans/frontend-backend-split.md](docs/plans/frontend-backend-split.md) for the full design rationale behind this split.
 
 ## Contributing
 
@@ -142,7 +116,7 @@ If you encounter a bug or have a feature suggestion, please report it using [Git
 3.  **Make your changes**: Implement your feature or bug fix.
 4.  **Lint your code**: Ensure your code adheres to the project's linting standards by running:
     ```bash
-    npm run lint
+    pnpm run lint
     ```
     Please fix any linting errors or warnings before committing.
 5.  **Commit your changes**: Write clear, concise, and descriptive commit messages.
@@ -151,7 +125,7 @@ If you encounter a bug or have a feature suggestion, please report it using [Git
 
 ### Code Style
 
-This project uses ESLint for code linting and formatting. The rules are defined in the project's ESLint configuration. Please ensure your contributions conform to these rules, as checked by the `npm run lint` command.
+This project uses ESLint for code linting and formatting. The rules are defined in the project's ESLint configuration. Please ensure your contributions conform to these rules, as checked by the `pnpm run lint` command.
 
 ### Setting up a Development Environment
 
@@ -168,43 +142,18 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 
 ## Deployment
 
-This application is a standard Next.js project and can be deployed to any platform that supports Node.js applications.
+Frontend and backend deploy separately.
 
-### Recommended: Vercel
+### Frontend: Vercel
 
-[Vercel](https://vercel.com/), the creators of Next.js, provide a seamless deployment experience for Next.js applications. The platform automatically handles build optimization, serverless functions, and global CDN distribution.
+The frontend deploys to [Vercel](https://vercel.com/) same as before, with one required change: set the project's **Root Directory** to `apps/frontend` in Settings → General (the app no longer lives at the repo root). Configure `apps/frontend/.env.example`'s variables as Vercel environment variables, with `NEXT_PUBLIC_API_URL` pointing at wherever the backend is deployed.
 
-To deploy to Vercel:
-1.  Push your code to a Git repository (GitHub, GitLab, Bitbucket).
-2.  Sign up or log in to [Vercel](https://vercel.com/signup).
-3.  Import your Git repository. Vercel will typically detect that it's a Next.js project and configure the build settings automatically.
-4.  **Environment Variables**: Configure the same environment variables as listed in the `.env.local` example (`POSTGRES_URL`, `AUTH_SECRET`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `NEXTAUTH_URL`) in your Vercel project settings. Ensure `NEXTAUTH_URL` is set to your production domain.
-5.  Deploy.
+### Backend: any Docker host
 
-For more detailed information, refer to the [Next.js deployment documentation on Vercel](https://nextjs.org/docs/deployment).
+The backend is a standard Docker container (`apps/backend/Dockerfile`) — deploy it to any host that can run one. A free option that works with zero changes to the Dockerfile:
+- **[Render](https://render.com/)** (free web service, deploy directly from `apps/backend/Dockerfile`) + **[Neon](https://neon.tech/)** or **[Supabase](https://supabase.com/)** (free Postgres — Render's own free Postgres is deleted after 90 days, so point `DATABASE_URL` at one of these instead). Render's free tier sleeps when idle, with a few seconds of cold start on wake.
 
-### Other Platforms
-
-You can also deploy this application to other platforms like:
--   AWS (Amplify, EC2, Elastic Beanstalk)
--   Google Cloud (Cloud Run, App Engine)
--   Azure (App Service)
--   Netlify
--   Heroku
--   DigitalOcean App Platform
-
-When deploying to these platforms, you will generally need to:
-1.  Ensure your deployment environment has Node.js installed.
-2.  Set up the required **environment variables** in your chosen platform's configuration (similar to the Vercel setup).
-3.  Use the following build command:
-    ```bash
-    npm run build
-    ```
-4.  And then start the application using:
-    ```bash
-    npm run start
-    ```
-    The specific commands and configuration for serving a Next.js app might vary slightly depending on the platform. Consult the documentation for your chosen hosting provider.
+Set the backend's environment variables (`DATABASE_URL`, `JWT_SECRET`, `INTERNAL_API_SECRET`, `FRONTEND_URL`) to match what the frontend expects, then point the frontend's `NEXT_PUBLIC_API_URL` at the deployed backend's URL.
 
 ## License
 
